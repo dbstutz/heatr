@@ -1,8 +1,10 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from back import just_ret_data, dict_to_string
+from back import just_ret_data, ai_insights, scan_athletes_ai, scan_no_data
 import json
+import shutil
+import os
 
 app = FastAPI()
 
@@ -19,18 +21,53 @@ class InputData(BaseModel):
     name: str
     school: str
 
+
+class InputDataWithPRs(BaseModel):
+    athName: str
+    personalRecords: list
+
+
 @app.get("/ping")
 def ping():
     return {"message": "pong"}
 
-@app.post("/getdata")
-def getdata(data: InputData):
+
+@app.post("/getinsights")
+def getinsights(data: InputDataWithPRs):
+    name = data.athName
+    prs = data.personalRecords
+    try:
+        insights = ai_insights(name, prs)
+        return {"success": True, "data": insights}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+@app.post("/getsingledata")
+def getsingledata(data: InputData):
     name = data.name
     school = data.school
-    if not name or not school:
-        return {"message": "Name and school must be provided."}
+    if not name:
+        return {"success": False, "error": "Name must be provided."}
     try:
-        result = dict_to_string(just_ret_data(school, name))
-        return {"message": result}
+        result = just_ret_data(school, name)
+        return {"success": True, "data": result}
     except Exception as e:
-        return {"message": f"Error: {str(e)}"}
+        return {"success": False, "error": str(e)}
+
+
+@app.post("/imagescanonly")
+def imagescanonly(file: UploadFile = File(...)):
+    try:
+        temp_dir = "uploaded_images"
+        os.makedirs(temp_dir, exist_ok=True)
+        file_path = os.path.join(temp_dir, file.filename)
+        
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+        
+        pairs = scan_athletes_ai(file_path)
+        os.remove(file_path)
+        return {"success": True, "data": pairs}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
