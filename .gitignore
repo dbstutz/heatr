@@ -1,9 +1,14 @@
-# Ignore Python virtual environment
-.venv/
-
-# Ignore environment variables
-.env
-
-# Ignore Python cache files
+# Python
 __pycache__/
-*.pyc
+*.py[cod]
+
+# Node
+node_modules/
+*.log
+
+# Env
+.env
+.venv
+
+# OS
+.DS_Store
