@@ -66,6 +66,7 @@ class Athlete:
             self.HTML = None
             raise Exception("Could not retrieve", response.status_code)
 
+
     def get_all_data(self):
         # If not created already get the dataframes
         if not self.dfs:
@@ -80,6 +81,7 @@ class Athlete:
         all_data['Personal Records'] = self.get_personal_records(soup, df)
         all_data['Most Recent'] = self.get_last_races(soup)
         return all_data
+
 
     def get_personal_records(self, soup, df):
         table = soup.find('table')  # or refine this if there are multiple tables
@@ -135,6 +137,7 @@ class Athlete:
 
         return result
 
+
     def get_meet_info(self, url):
         '''
         headers = {
@@ -169,6 +172,7 @@ class Athlete:
             "meet_date": meet_date
         }
 
+
     def get_athlete_profile_url(self, name, team):
         base_url = "https://www.tfrrs.org"
         search_url = f"{base_url}/search.html?athlete={'+'.join(name.strip().split())}&team={team}"
@@ -198,6 +202,7 @@ class Athlete:
             # Try again without team
             search_url = f"{base_url}/search.html?athlete={'+'.join(name.strip().split())}"
         return None
+
 
     def get_last_races(self, soup):
         tables = soup.find_all('table', class_=lambda x: x and 'table-hover' in x)
@@ -234,40 +239,5 @@ class Athlete:
                 ))
 
         return events[:3]
-        if "/" in Date:
 
-            def chunkToFormat(chunk):
-                month, day = chunk.split("/")
-                numToMonth = {
-                    "01": "Jan",
-                    "02": "Feb",
-                    "03": "Mar",
-                    "04": "Apr",
-                    "05": "May",
-                    "06": "Jun",
-                    "07": "Jul",
-                    "08": "Aug",
-                    "09": "Sep",
-                    "10": "Oct",
-                    "11": "Nov",
-                    "12": "Dec",
-                }
-                month = numToMonth[month]
-                return month + " " + day
-
-            dashIndex = Date.index("-")
-            year = Date[-4:]
-            chunk = Date[: dashIndex - 1]
-            return chunkToFormat(chunk) + ", " + year, Date[dashIndex + 2 :]
-
-        elif "-" in Date:
-            Month = Date[: Date.index(" ")]
-            Year = Date[-4:]
-            Days = Date.split(" ")[1].replace(",", "").split("-")
-            return (
-                Month + " " + Days[0] + ", " + Year,
-                Month + " " + Days[1] + ", " + Year,
-            )
-
-        else:
-            return Date, Date
+        

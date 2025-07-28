@@ -1,7 +1,7 @@
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from back import just_ret_data, insights_gpt, scan_athletes_gpt, scan_no_data
+from back import fetch_athlete_data, insights_gpt, scan_athletes_gpt, scan_regex
 import json
 import shutil
 import os
@@ -50,7 +50,7 @@ def getsingledata(data: InputData):
     if not name:
         return {"success": False, "error": "Name must be provided."}
     try:
-        result = just_ret_data(school, name)
+        result = fetch_athlete_data(school, name)
         return {"success": True, "data": result}
     except Exception as e:
         return {"success": False, "error": str(e)}

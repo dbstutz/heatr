@@ -1,30 +1,30 @@
 import ast
+import AthleticAPI.AthleticNetAthlete as anet
 from dotenv import load_dotenv
 from ocr_parser.parser import extract_text_from_image, parse_athletes_old
 from openai import OpenAI
 import os
 import requests
 import sys
-import TFRRSAPI.AthleteTfrrs as tfr
+import TFRRSAPI.TFRRSAthlete as tfr
 import time
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 load_dotenv()
 
 client = OpenAI(
-    # This is the default and can be omitted
     api_key=os.environ.get("OPENAI_API_KEY"),
   )
 
 
-def just_ret_data(school, name):
+def fetch_athlete_data(school, name):
   athlete = tfr.Athlete(school, name)
   athlete_data = athlete.get_all_data()
   athlete_data['Name'] = name
   return athlete_data
 
 
-def scan_no_data(img_path):
+def scan_regex(img_path):
   text = extract_text_from_image(img_path)
   athletes = parse_athletes_old(text)
   heat_data = []
@@ -176,7 +176,6 @@ def main():
 
   # print(scan_no_data("test_images/first_sheet.jpg"))
   # print(extract_text_from_image("test_images/test100.jpg"))
-  # print(just_ret_data("school", "Trenton Sandler"))
   # print(scan_athletes_gpt("test_images/goofy.PNG"))
 
   # end = time.time()
@@ -186,6 +185,10 @@ def main():
 
 if __name__ == "__main__":
   main()
+  boyA = anet.Athlete("LSU", "Trenton Sandler")
+  boyT = tfr.Athlete("LSU", "Trenton Sandler")
+  print(boyA.get_all_data())
+  print(boyT.get_all_data())
 
   
 
